@@ -1,0 +1,688 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Source Documentation &mdash; cfxwrapper 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="cfxwrapper 0.1.0 documentation" href="index.html" />
+    <link rel="next" title="Package Metadata" href="pkgdocs.html" />
+    <link rel="prev" title="Usage Guide" href="usage.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pkgdocs.html" title="Package Metadata"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="usage.html" title="Usage Guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">cfxwrapper 0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="source-documentation">
+<span id="cfxwrapper-src-label"></span><h1>Source Documentation<a class="headerlink" href="#source-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-cfxwrapper.cclparser">
+<span id="cclparser-py"></span><span id="cfxwrapper-cclparser-py"></span><span id="index-0"></span><h2>cclparser.py<a class="headerlink" href="#module-cfxwrapper.cclparser" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cfxwrapper.cclparser.Boundary">
+<em class="property">class </em><tt class="descclassname">cfxwrapper.cclparser.</tt><tt class="descname">Boundary</tt><big>(</big><em>n</em>, <em>d</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#Boundary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.Boundary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Holds info about a CFX Boundary.</p>
+<dl class="method">
+<dt id="cfxwrapper.cclparser.Boundary.get_location_names">
+<tt class="descname">get_location_names</tt><big>(</big><em>loc_dict</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#Boundary.get_location_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.Boundary.get_location_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.Boundary.output">
+<tt class="descname">output</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#Boundary.output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.Boundary.output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Boundary.attributes">
+<tt class="descname">attributes</tt><em class="property"> = {}</em><a class="headerlink" href="#cfxwrapper.cclparser.Boundary.attributes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Boundary.name">
+<tt class="descname">name</tt><em class="property"> = ''</em><a class="headerlink" href="#cfxwrapper.cclparser.Boundary.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Boundary.type">
+<tt class="descname">type</tt><em class="property"> = ''</em><a class="headerlink" href="#cfxwrapper.cclparser.Boundary.type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cfxwrapper.cclparser.CCLEntityParser">
+<em class="property">class </em><tt class="descclassname">cfxwrapper.cclparser.</tt><tt class="descname">CCLEntityParser</tt><big>(</big><em>data_array</em>, <em>logger=None</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLEntityParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLEntityParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cfxwrapper.cclparser.StringArrayParser" title="cfxwrapper.cclparser.StringArrayParser"><tt class="xref py py-class docutils literal"><span class="pre">cfxwrapper.cclparser.StringArrayParser</span></tt></a></p>
+<p>Puts ANSYS CFX CCL information into a dictionary structure.</p>
+<p>Lines containing &#8216;&#8217;=&#8217;&#8217; will be put into the top-level dictionary.</p>
+<p>Lines containing &#8216;&#8217;:&#8217;&#8217; signify the start of a sub-dictionary.</p>
+<dl class="method">
+<dt id="cfxwrapper.cclparser.CCLEntityParser.parse">
+<tt class="descname">parse</tt><big>(</big><em>depth=0</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLEntityParser.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLEntityParser.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fill the dictionary.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.CCLEntityParser.dictionary">
+<tt class="descname">dictionary</tt><em class="property"> = {}</em><a class="headerlink" href="#cfxwrapper.cclparser.CCLEntityParser.dictionary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cfxwrapper.cclparser.CCLParser">
+<em class="property">class </em><tt class="descclassname">cfxwrapper.cclparser.</tt><tt class="descname">CCLParser</tt><big>(</big><em>filename</em>, <em>logger=None</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Parser for an ANSYS CFX CCL file.</p>
+<p>The CCL file is generated by ANSYS CFX-Pre: File-&gt;Export-&gt;CCL.</p>
+<p>CCLParser looks for definitions of ANSYS CFX entities to expose
+to the wrapper.</p>
+<p>See CFX Reference Guide Section 12.1 for CCL syntax</p>
+<dl class="method">
+<dt id="cfxwrapper.cclparser.CCLParser.get_length_units">
+<tt class="descname">get_length_units</tt><big>(</big><em>debug=False</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLParser.get_length_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.get_length_units" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.CCLParser.get_location_dictionary">
+<tt class="descname">get_location_dictionary</tt><big>(</big><em>debug=False</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLParser.get_location_dictionary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.get_location_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.CCLParser.getdomains">
+<tt class="descname">getdomains</tt><big>(</big><em>flow</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLParser.getdomains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.getdomains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get information about the Domains defined in the flow.
+In particular, get Boundary and Monitor Point information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.CCLParser.getexpressions">
+<tt class="descname">getexpressions</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLParser.getexpressions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.getexpressions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get expressions defined in LIBRARY:CEL:EXPRESSIONS:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.CCLParser.getflow_parser">
+<tt class="descname">getflow_parser</tt><big>(</big><em>sr</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLParser.getflow_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.getflow_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a parser for just the FLOW section of the CCL file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.CCLParser.getlibrary_parser">
+<tt class="descname">getlibrary_parser</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLParser.getlibrary_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.getlibrary_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a parser for just the LIBRARY section of the CCL file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.CCLParser.getmonitorpoints">
+<tt class="descname">getmonitorpoints</tt><big>(</big><em>flow</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLParser.getmonitorpoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.getmonitorpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get monitor points defined in FLOW: OUTPUT CONTROL: MONITOR OBJECTS:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.CCLParser.getname">
+<tt class="descname">getname</tt><big>(</big><em>anchor</em>, <em>line</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLParser.getname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.getname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name defined on the line after <em>anchor</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.CCLParser.getunits">
+<tt class="descname">getunits</tt><big>(</big><em>flow</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLParser.getunits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.getunits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get SOLUTION UNITS defined in the flow.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.CCLParser.output">
+<tt class="descname">output</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLParser.output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.CCLParser.parse">
+<tt class="descname">parse</tt><big>(</big><em>do_location_dictionary=False</em>, <em>do_length_units=False</em>, <em>debug=False</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#CCLParser.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the CCL File.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.CCLParser.expressions">
+<tt class="descname">expressions</tt><em class="property"> = {}</em><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.expressions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.CCLParser.flows">
+<tt class="descname">flows</tt><em class="property"> = []</em><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.flows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.CCLParser.location_dictionary">
+<tt class="descname">location_dictionary</tt><em class="property"> = {}</em><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.location_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.CCLParser.units">
+<tt class="descname">units</tt><em class="property"> = set([])</em><a class="headerlink" href="#cfxwrapper.cclparser.CCLParser.units" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cfxwrapper.cclparser.Domain">
+<em class="property">class </em><tt class="descclassname">cfxwrapper.cclparser.</tt><tt class="descname">Domain</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#Domain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.Domain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Holds info about a CFX Domain.</p>
+<dl class="method">
+<dt id="cfxwrapper.cclparser.Domain.get_location_names">
+<tt class="descname">get_location_names</tt><big>(</big><em>d_loc_dict</em>, <em>b_loc_dict</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#Domain.get_location_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.Domain.get_location_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.Domain.output">
+<tt class="descname">output</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#Domain.output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.Domain.output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Domain.domaintype">
+<tt class="descname">domaintype</tt><em class="property"> = ''</em><a class="headerlink" href="#cfxwrapper.cclparser.Domain.domaintype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Domain.inlets">
+<tt class="descname">inlets</tt><em class="property"> = []</em><a class="headerlink" href="#cfxwrapper.cclparser.Domain.inlets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Domain.interfaces">
+<tt class="descname">interfaces</tt><em class="property"> = []</em><a class="headerlink" href="#cfxwrapper.cclparser.Domain.interfaces" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Domain.location">
+<tt class="descname">location</tt><em class="property"> = ''</em><a class="headerlink" href="#cfxwrapper.cclparser.Domain.location" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Domain.name">
+<tt class="descname">name</tt><em class="property"> = ''</em><a class="headerlink" href="#cfxwrapper.cclparser.Domain.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Domain.openings">
+<tt class="descname">openings</tt><em class="property"> = []</em><a class="headerlink" href="#cfxwrapper.cclparser.Domain.openings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Domain.outlets">
+<tt class="descname">outlets</tt><em class="property"> = []</em><a class="headerlink" href="#cfxwrapper.cclparser.Domain.outlets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Domain.symmetries">
+<tt class="descname">symmetries</tt><em class="property"> = []</em><a class="headerlink" href="#cfxwrapper.cclparser.Domain.symmetries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Domain.walls">
+<tt class="descname">walls</tt><em class="property"> = []</em><a class="headerlink" href="#cfxwrapper.cclparser.Domain.walls" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cfxwrapper.cclparser.Flow">
+<em class="property">class </em><tt class="descclassname">cfxwrapper.cclparser.</tt><tt class="descname">Flow</tt><big>(</big><em>n</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#Flow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.Flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Holds info about a CFX Flow entity.</p>
+<dl class="method">
+<dt id="cfxwrapper.cclparser.Flow.get_length_units">
+<tt class="descname">get_length_units</tt><big>(</big><em>units</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#Flow.get_length_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.Flow.get_length_units" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.Flow.get_location_names">
+<tt class="descname">get_location_names</tt><big>(</big><em>d_loc_dict</em>, <em>b_loc_dict</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#Flow.get_location_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.Flow.get_location_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.Flow.output">
+<tt class="descname">output</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#Flow.output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.Flow.output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Flow.domains">
+<tt class="descname">domains</tt><em class="property"> = []</em><a class="headerlink" href="#cfxwrapper.cclparser.Flow.domains" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Flow.monitorpoints">
+<tt class="descname">monitorpoints</tt><em class="property"> = {}</em><a class="headerlink" href="#cfxwrapper.cclparser.Flow.monitorpoints" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Flow.name">
+<tt class="descname">name</tt><em class="property"> = ''</em><a class="headerlink" href="#cfxwrapper.cclparser.Flow.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.Flow.units">
+<tt class="descname">units</tt><em class="property"> = []</em><a class="headerlink" href="#cfxwrapper.cclparser.Flow.units" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cfxwrapper.cclparser.StringArrayParser">
+<em class="property">class </em><tt class="descclassname">cfxwrapper.cclparser.</tt><tt class="descname">StringArrayParser</tt><big>(</big><em>data_array</em>, <em>filename=''</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#StringArrayParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.StringArrayParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">openmdao.util.filewrap.FileParser</span></tt></p>
+<p>Like FileParser for an array of data strings.
+Has methods for finding the <em>end_string</em> that matches an anchor.</p>
+<dl class="method">
+<dt id="cfxwrapper.cclparser.StringArrayParser.find_end">
+<tt class="descname">find_end</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#StringArrayParser.find_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.StringArrayParser.find_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds end row in data that matches <em>current_row</em>.</p>
+<p>Does not change the anchor.</p>
+<p>Returns -1 if not found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.StringArrayParser.find_range">
+<tt class="descname">find_range</tt><big>(</big><em>anchor</em>, <em>sr=0</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#StringArrayParser.find_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.StringArrayParser.find_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the start and end rows in data for the entity that starts with <em>anchor</em>.</p>
+<p>Leaves the anchor set at the line that contains <tt class="docutils literal"><span class="pre">anchor</span></tt>.</p>
+<p>Returns startrow and endrow. Returns -1 for both if anchor is not found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.StringArrayParser.mark_anchor_withs">
+<tt class="descname">mark_anchor_withs</tt><big>(</big><em>anchor</em>, <em>sr=0</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#StringArrayParser.mark_anchor_withs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.StringArrayParser.mark_anchor_withs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.StringArrayParser.preprocess">
+<tt class="descname">preprocess</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#StringArrayParser.preprocess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.StringArrayParser.preprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles continuation lines ending with            and comments starting with non-escaped #.
+Removes blank lines and trailing white space.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.StringArrayParser.set_end_string">
+<tt class="descname">set_end_string</tt><big>(</big><em>e</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#StringArrayParser.set_end_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.StringArrayParser.set_end_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the end string to use for matching.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.StringArrayParser.set_exclude_string">
+<tt class="descname">set_exclude_string</tt><big>(</big><em>e</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#StringArrayParser.set_exclude_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.StringArrayParser.set_exclude_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the exclude string to use for matching.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.StringArrayParser.set_start_string">
+<tt class="descname">set_start_string</tt><big>(</big><em>e</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#StringArrayParser.set_start_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.StringArrayParser.set_start_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the start string to use for matching.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cclparser.StringArrayParser.strip_comments">
+<tt class="descname">strip_comments</tt><big>(</big><em>line</em>, <em>start=0</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#StringArrayParser.strip_comments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.StringArrayParser.strip_comments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Strip CCL comments (starting with #) from a line.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.StringArrayParser.end_string">
+<tt class="descname">end_string</tt><em class="property"> = 'END'</em><a class="headerlink" href="#cfxwrapper.cclparser.StringArrayParser.end_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.StringArrayParser.exclude_string">
+<tt class="descname">exclude_string</tt><em class="property"> = '='</em><a class="headerlink" href="#cfxwrapper.cclparser.StringArrayParser.exclude_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cclparser.StringArrayParser.start_string">
+<tt class="descname">start_string</tt><em class="property"> = ':'</em><a class="headerlink" href="#cfxwrapper.cclparser.StringArrayParser.start_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cfxwrapper.cclparser.do_logging">
+<tt class="descclassname">cfxwrapper.cclparser.</tt><tt class="descname">do_logging</tt><big>(</big><em>logger</em>, <em>msg</em>, <em>both=False</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cclparser.html#do_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cclparser.do_logging" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-cfxwrapper.cfxunitsinfo">
+<span id="cfxunitsinfo-py"></span><span id="cfxwrapper-cfxunitsinfo-py"></span><span id="index-1"></span><h2>cfxunitsinfo.py<a class="headerlink" href="#module-cfxwrapper.cfxunitsinfo" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cfxwrapper.cfxunitsinfo.MonitorPointOutput">
+<em class="property">class </em><tt class="descclassname">cfxwrapper.cfxunitsinfo.</tt><tt class="descname">MonitorPointOutput</tt><big>(</big><em>flowname</em>, <em>name</em>, <em>expr</em>, <em>option</em>, <em>units</em>, <em>varname=''</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxunitsinfo.html#MonitorPointOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.MonitorPointOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Information about a monitor point used as an output variable.</p>
+<dl class="method">
+<dt id="cfxwrapper.cfxunitsinfo.MonitorPointOutput.info">
+<tt class="descname">info</tt><big>(</big><em>stripquotes=False</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxunitsinfo.html#MonitorPointOutput.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.MonitorPointOutput.info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cfxunitsinfo.MonitorPointOutput.output">
+<tt class="descname">output</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxunitsinfo.html#MonitorPointOutput.output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.MonitorPointOutput.output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cfxwrapper.cfxunitsinfo.PossibleInput">
+<em class="property">class </em><tt class="descclassname">cfxwrapper.cfxunitsinfo.</tt><tt class="descname">PossibleInput</tt><big>(</big><em>p</em>, <em>n</em>, <em>v</em>, <em>u</em>, <em>varname=''</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxunitsinfo.html#PossibleInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.PossibleInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Information about a possible input variable in the CFX Flow.</p>
+<dl class="method">
+<dt id="cfxwrapper.cfxunitsinfo.PossibleInput.cclout">
+<tt class="descname">cclout</tt><big>(</big><em>f</em>, <em>val</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxunitsinfo.html#PossibleInput.cclout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.PossibleInput.cclout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cfxunitsinfo.PossibleInput.info">
+<tt class="descname">info</tt><big>(</big><em>stripquotes=False</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxunitsinfo.html#PossibleInput.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.PossibleInput.info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cfxunitsinfo.PossibleInput.output">
+<tt class="descname">output</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxunitsinfo.html#PossibleInput.output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.PossibleInput.output" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cfxunitsinfo.PossibleInput.name">
+<tt class="descname">name</tt><em class="property"> = ''</em><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.PossibleInput.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cfxunitsinfo.PossibleInput.path">
+<tt class="descname">path</tt><em class="property"> = []</em><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.PossibleInput.path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cfxunitsinfo.PossibleInput.units">
+<tt class="descname">units</tt><em class="property"> = ''</em><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.PossibleInput.units" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cfxunitsinfo.PossibleInput.value">
+<tt class="descname">value</tt><em class="property"> = 0</em><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.PossibleInput.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cfxwrapper.cfxunitsinfo.PossibleInput.varname">
+<tt class="descname">varname</tt><em class="property"> = ''</em><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.PossibleInput.varname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cfxwrapper.cfxunitsinfo.get_number">
+<tt class="descclassname">cfxwrapper.cfxunitsinfo.</tt><tt class="descname">get_number</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxunitsinfo.html#get_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.get_number" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="cfxwrapper.cfxunitsinfo.make_unique_name">
+<tt class="descclassname">cfxwrapper.cfxunitsinfo.</tt><tt class="descname">make_unique_name</tt><big>(</big><em>currpath</em>, <em>n</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxunitsinfo.html#make_unique_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.make_unique_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="cfxwrapper.cfxunitsinfo.translate">
+<tt class="descclassname">cfxwrapper.cfxunitsinfo.</tt><tt class="descname">translate</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxunitsinfo.html#translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxunitsinfo.translate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-cfxwrapper.cfxwrapper">
+<span id="cfxwrapper-py"></span><span id="cfxwrapper-cfxwrapper-py"></span><span id="index-2"></span><h2>cfxwrapper.py<a class="headerlink" href="#module-cfxwrapper.cfxwrapper" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cfxwrapper.cfxwrapper.CFXWrapper">
+<em class="property">class </em><tt class="descclassname">cfxwrapper.cfxwrapper.</tt><tt class="descname">CFXWrapper</tt><a class="reference internal" href="_modules/cfxwrapper/cfxwrapper.html#CFXWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrapper.CFXWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">openmdao.lib.components.external_code.ExternalCode</span></tt></p>
+<p>Base class for wrappers for ANSYS CFX.  Is only used by a generated CFX Wrapper.  See cfxwrappergenerator.GenerateCFXWrapper.</p>
+<dl class="docutils">
+<dt><em>Str</em> <strong>newdeffile</strong></dt>
+<dd><p class="first">a new CFX .def file to use instead of the original, can be used to apply deflections to all nodes</p>
+<ul class="last simple">
+<li>default:  &#8216;&#8217;</li>
+<li>iotype:  &#8216;in&#8217;</li>
+<li>vartypename:  &#8216;Str&#8217;</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="cfxwrapper.cfxwrapper.CFXWrapper.execute">
+<tt class="descname">execute</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrapper.html#CFXWrapper.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrapper.CFXWrapper.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cfxwrapper.CFXWrapper.picklecache">
+<tt class="descname">picklecache</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrapper.html#CFXWrapper.picklecache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrapper.CFXWrapper.picklecache" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cfxwrapper.CFXWrapper.readmon">
+<tt class="descname">readmon</tt><big>(</big><em>cmd</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrapper.html#CFXWrapper.readmon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrapper.CFXWrapper.readmon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cfxwrapper.cfxwrappergenerator">
+<span id="cfxwrappergenerator-py"></span><span id="cfxwrapper-cfxwrappergenerator-py"></span><span id="index-3"></span><h2>cfxwrappergenerator.py<a class="headerlink" href="#module-cfxwrapper.cfxwrappergenerator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cfxwrapper.cfxwrappergenerator.GenerateCFXWrapper">
+<em class="property">class </em><tt class="descclassname">cfxwrapper.cfxwrappergenerator.</tt><tt class="descname">GenerateCFXWrapper</tt><big>(</big><em>origcclfile</em>, <em>deffile</em>, <em>workingdir</em>, <em>name=''</em>, <em>origresfile=''</em>, <em>cachefile=''</em>, <em>ansyspathstring='AWP_ROOT145'</em>, <em>logger=None</em>, <em>parser=None</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrappergenerator.html#GenerateCFXWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrappergenerator.GenerateCFXWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the subclass of CFXWrapper specifically for the given CCL, .def, and .res files.</p>
+<dl class="docutils">
+<dt>To use:  Initialize, then call generate to create the wrapped CFX component.  </dt>
+<dd>Use that component as you would any other OpenMDAO component.</dd>
+</dl>
+<p><em>Parameters</em></p>
+<blockquote>
+<div><dl class="docutils">
+<dt>origcclfile: string</dt>
+<dd>full path to .ccl file created from the ANSYS CFX Model.</dd>
+<dt>deffile: string</dt>
+<dd>full path to .def file created from the ANSYS CFX Model.</dd>
+<dt>workingdir: string</dt>
+<dd>full path to directory in which to work and store results.</dd>
+<dt>name: string</dt>
+<dd>unique identifying name for this wrapper.</dd>
+<dt>origresfile: string</dt>
+<dd>full path to .res file created from a run of the ANSYS CFX Model.</dd>
+<dt>cachefile: string (optional)</dt>
+<dd>if not None, full path to a previously created file that caches the results of runs of the generated wrapper. Default None.</dd>
+<dt>ansyspathstring: string (optional)</dt>
+<dd>key in environ to identify path to ANSYS installation.  Default &#8216;AWP_ROOT145&#8217;</dd>
+<dt>logger: logging.Logger (optional)</dt>
+<dd>an existing Logger to use for output.  If None, output will go to stdout.  Default None.</dd>
+<dt>parser: cclparser.CCLParser (optional)</dt>
+<dd>an existing CCLParser for the origcclfile. Used only for testing. If None, parser is created. Default None.</dd>
+</dl>
+</div></blockquote>
+<dl class="method">
+<dt id="cfxwrapper.cfxwrappergenerator.GenerateCFXWrapper.do_logging">
+<tt class="descname">do_logging</tt><big>(</big><em>msg</em>, <em>both=False</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrappergenerator.html#GenerateCFXWrapper.do_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrappergenerator.GenerateCFXWrapper.do_logging" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cfxwrappergenerator.GenerateCFXWrapper.generate">
+<tt class="descname">generate</tt><big>(</big><em>dump=False</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrappergenerator.html#GenerateCFXWrapper.generate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrappergenerator.GenerateCFXWrapper.generate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the wrapper.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cfxwrappergenerator.GenerateCFXWrapper.set_inputvals_str">
+<tt class="descname">set_inputvals_str</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrappergenerator.html#GenerateCFXWrapper.set_inputvals_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrappergenerator.GenerateCFXWrapper.set_inputvals_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>generate string that sets the super class inputvals</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cfxwrapper.cfxwrappergenerator.TestCFX">
+<em class="property">class </em><tt class="descclassname">cfxwrapper.cfxwrappergenerator.</tt><tt class="descname">TestCFX</tt><big>(</big><em>runner</em>, <em>flow</em>, <em>name</em>, <em>expr</em>, <em>logger=None</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrappergenerator.html#TestCFX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrappergenerator.TestCFX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">openmdao.lib.components.external_code.ExternalCode</span></tt></p>
+<p>Run a test of CFX to get error messages related to monitor point units.
+This is very convoluted, but it seems to be the only way to get CFX to
+tell us what it knows about units.</p>
+<dl class="method">
+<dt id="cfxwrapper.cfxwrappergenerator.TestCFX.do_logging">
+<tt class="descname">do_logging</tt><big>(</big><em>msg</em>, <em>both=False</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrappergenerator.html#TestCFX.do_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrappergenerator.TestCFX.do_logging" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cfxwrappergenerator.TestCFX.execute">
+<tt class="descname">execute</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrappergenerator.html#TestCFX.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrappergenerator.TestCFX.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cfxwrapper.cfxwrappergenerator.TestRunner">
+<em class="property">class </em><tt class="descclassname">cfxwrapper.cfxwrappergenerator.</tt><tt class="descname">TestRunner</tt><big>(</big><em>deffile</em>, <em>workdir</em>, <em>base</em>, <em>ansyspath</em>, <em>logger=None</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrappergenerator.html#TestRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrappergenerator.TestRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal class to run CFX only to get error messages telling us the units of Monitor Points.</p>
+<dl class="method">
+<dt id="cfxwrapper.cfxwrappergenerator.TestRunner.do_logging">
+<tt class="descname">do_logging</tt><big>(</big><em>msg</em>, <em>both=False</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrappergenerator.html#TestRunner.do_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrappergenerator.TestRunner.do_logging" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cfxwrappergenerator.TestRunner.set_flow_dict">
+<tt class="descname">set_flow_dict</tt><big>(</big><em>fl</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrappergenerator.html#TestRunner.set_flow_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrappergenerator.TestRunner.set_flow_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.cfxwrappergenerator.TestRunner.translate">
+<tt class="descname">translate</tt><big>(</big><em>u</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/cfxwrappergenerator.html#TestRunner.translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.cfxwrappergenerator.TestRunner.translate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cfxwrapper.test.test_cfxwrapper">
+<span id="test-cfxwrapper-py"></span><span id="cfxwrapper-test-test-cfxwrapper-py"></span><span id="index-4"></span><h2>test_cfxwrapper.py<a class="headerlink" href="#module-cfxwrapper.test.test_cfxwrapper" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cfxwrapper.test.test_cfxwrapper.CFXWrapperTestCase">
+<em class="property">class </em><tt class="descclassname">cfxwrapper.test.test_cfxwrapper.</tt><tt class="descname">CFXWrapperTestCase</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/cfxwrapper/test/test_cfxwrapper.html#CFXWrapperTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.test.test_cfxwrapper.CFXWrapperTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
+<dl class="method">
+<dt id="cfxwrapper.test.test_cfxwrapper.CFXWrapperTestCase.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/test/test_cfxwrapper.html#CFXWrapperTestCase.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.test.test_cfxwrapper.CFXWrapperTestCase.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cfxwrapper.test.test_cfxwrapper.CFXWrapperTestCase.tearDown">
+<tt class="descname">tearDown</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/cfxwrapper/test/test_cfxwrapper.html#CFXWrapperTestCase.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cfxwrapper.test.test_cfxwrapper.CFXWrapperTestCase.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Source Documentation</a><ul>
+<li><a class="reference internal" href="#module-cfxwrapper.cclparser">cclparser.py</a></li>
+<li><a class="reference internal" href="#module-cfxwrapper.cfxunitsinfo">cfxunitsinfo.py</a></li>
+<li><a class="reference internal" href="#module-cfxwrapper.cfxwrapper">cfxwrapper.py</a></li>
+<li><a class="reference internal" href="#module-cfxwrapper.cfxwrappergenerator">cfxwrappergenerator.py</a></li>
+<li><a class="reference internal" href="#module-cfxwrapper.test.test_cfxwrapper">test_cfxwrapper.py</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="usage.html"
+                        title="previous chapter">Usage Guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pkgdocs.html"
+                        title="next chapter">Package Metadata</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/srcdocs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pkgdocs.html" title="Package Metadata"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="usage.html" title="Usage Guide"
+             >previous</a> |</li>
+        <li><a href="index.html">cfxwrapper 0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011-2013 Mechanical Solutions, Inc..
+      Last updated on Oct 30, 2013.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

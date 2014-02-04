@@ -1,0 +1,3 @@
+graft src/cfxwrapper/sphinx_build/html
+recursive-include src/cfxwrapper/test *.py
+

@@ -1,0 +1,245 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cfxwrapper.cfxunitsinfo &mdash; cfxwrapper 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="cfxwrapper 0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">cfxwrapper 0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for cfxwrapper.cfxunitsinfo</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="sd">&quot;&quot;&quot;Translate a units string from CFX to OpenMDAO. Also info about CFX I/0.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="get_number"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxunitsinfo.get_number">[docs]</a><span class="k">def</span> <span class="nf">get_number</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">answer</span><span class="p">,</span> <span class="bp">True</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="make_unique_name"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxunitsinfo.make_unique_name">[docs]</a><span class="k">def</span> <span class="nf">make_unique_name</span><span class="p">(</span><span class="n">currpath</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">currpath</span><span class="p">:</span>
+        <span class="n">spl</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spl</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="n">spl</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#39;_&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="n">spl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#39;_&#39;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="n">n</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;_&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">s</span>
+</div>
+<div class="viewcode-block" id="PossibleInput"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxunitsinfo.PossibleInput">[docs]</a><span class="k">class</span> <span class="nc">PossibleInput</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Information about a possible input variable in the CFX Flow.&quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list - will contain full path to the item</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">units</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">varname</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">varname</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">u</span>
+        <span class="k">if</span> <span class="n">varname</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">varname</span> <span class="o">=</span> <span class="n">make_unique_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">varname</span> <span class="o">=</span> <span class="n">varname</span>
+<div class="viewcode-block" id="PossibleInput.info"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxunitsinfo.PossibleInput.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stripquotes</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">&#39; = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> \
+               <span class="s">&#39; [&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">+</span> <span class="s">&#39;]&#39;</span>
+        <span class="k">if</span> <span class="n">stripquotes</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+<div class="viewcode-block" id="PossibleInput.output"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxunitsinfo.PossibleInput.output">[docs]</a>    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">varname</span> <span class="o">+</span> <span class="s">&#39; IS &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">()</span></div>
+<div class="viewcode-block" id="PossibleInput.cclout"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxunitsinfo.PossibleInput.cclout">[docs]</a>    <span class="k">def</span> <span class="nf">cclout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="n">ends</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">ends</span> <span class="o">=</span> <span class="n">ends</span> <span class="o">+</span> <span class="s">&#39;END</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">&#39; = &#39;</span> <span class="o">+</span> <span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s">&#39;.16g&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; [&#39;</span> <span class="o">+</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">+</span> <span class="s">&#39;]</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ends</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="MonitorPointOutput"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxunitsinfo.MonitorPointOutput">[docs]</a><span class="k">class</span> <span class="nc">MonitorPointOutput</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Information about a monitor point used as an output variable.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flowname</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">expr</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">varname</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flowname</span> <span class="o">=</span> <span class="n">flowname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expression_value</span> <span class="o">=</span> <span class="n">expr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">option</span> <span class="o">=</span> <span class="n">option</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+        <span class="k">if</span> <span class="n">varname</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">flowname</span> <span class="o">+</span> <span class="s">&#39;__&#39;</span> <span class="o">+</span> <span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">varname</span> <span class="o">=</span>  <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">varname</span> <span class="o">=</span> <span class="n">varname</span>
+<div class="viewcode-block" id="MonitorPointOutput.info"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxunitsinfo.MonitorPointOutput.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stripquotes</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span> 
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flowname</span> <span class="o">+</span> <span class="s">&#39;: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">&#39; = &#39;</span> \
+               <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expression_value</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">option</span>
+        <span class="k">if</span> <span class="n">stripquotes</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+<div class="viewcode-block" id="MonitorPointOutput.output"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxunitsinfo.MonitorPointOutput.output">[docs]</a>    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">varname</span> <span class="o">+</span> <span class="s">&#39; IS &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#39; [&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">+</span> <span class="s">&#39;]&#39;</span>
+
+<span class="c">#Basic translations - based on list in CFX documentation</span>
+<span class="c"># // CFX-Pre User&#39;s Guide // 19. Units and Dimensions // 19.2. Using Units in CFX-Pre // 19.2.1. Units Commonly Used in CFX</span></div></div>
+<span class="n">basics</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;mile&#39;</span><span class="p">:</span> <span class="s">&#39;mi&#39;</span><span class="p">,</span> <span class="s">&#39;foot&#39;</span><span class="p">:</span> <span class="s">&#39;ft&#39;</span><span class="p">,</span> <span class="c">#length</span>
+    <span class="s">&#39;K&#39;</span><span class="p">:</span> <span class="s">&#39;degK&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">:</span> <span class="s">&#39;degC&#39;</span><span class="p">,</span> <span class="s">&#39;R&#39;</span><span class="p">:</span> <span class="s">&#39;degR&#39;</span><span class="p">,</span> <span class="s">&#39;F&#39;</span><span class="p">:</span> <span class="s">&#39;degF&#39;</span><span class="p">,</span> <span class="c">#temperature</span>
+    <span class="s">&#39;litre&#39;</span><span class="p">:</span> <span class="s">&#39;l&#39;</span><span class="p">,</span> <span class="s">&#39;gallon&#39;</span><span class="p">:</span> <span class="s">&#39;galUK&#39;</span><span class="p">,</span> <span class="s">&#39;gallonUSliquid&#39;</span><span class="p">:</span> <span class="s">&#39;galUS&#39;</span><span class="p">,</span> <span class="c">#volume</span>
+    <span class="s">&#39;tonne&#39;</span><span class="p">:</span> <span class="s">&#39;tn&#39;</span><span class="p">,</span> <span class="s">&#39;lb&#39;</span><span class="p">:</span> <span class="s">&#39;lbm&#39;</span><span class="p">,</span> <span class="c">#mass</span>
+    <span class="s">&#39;dyne&#39;</span><span class="p">:</span> <span class="s">&#39;dyn&#39;</span><span class="p">,</span> <span class="c">#force</span>
+    <span class="s">&#39;poise&#39;</span><span class="p">:</span> <span class="s">&#39;g * cm**-1 / s&#39;</span><span class="p">,</span> <span class="c"># dynamic viscosity</span>
+    <span class="s">&#39;hour&#39;</span><span class="p">:</span> <span class="s">&#39;h&#39;</span><span class="p">,</span> <span class="s">&#39;hr&#39;</span><span class="p">:</span> <span class="s">&#39;h&#39;</span><span class="p">,</span> <span class="c">#time</span>
+    <span class="s">&#39;BTU&#39;</span><span class="p">:</span> <span class="s">&#39;Btu&#39;</span><span class="p">,</span> <span class="c">#energy</span>
+    <span class="s">&#39;radian&#39;</span><span class="p">:</span> <span class="s">&#39;rad&#39;</span><span class="p">,</span> <span class="s">&#39;degree&#39;</span><span class="p">:</span> <span class="s">&#39;deg&#39;</span> <span class="c">#angle</span>
+    <span class="p">}</span>
+<span class="n">prefixes</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;nano&#39;</span><span class="p">:</span> <span class="s">&#39;n&#39;</span><span class="p">,</span> <span class="s">&#39;micro&#39;</span><span class="p">:</span> <span class="s">&#39;u&#39;</span><span class="p">,</span> <span class="s">&#39;centi&#39;</span><span class="p">:</span> <span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;kilo&#39;</span><span class="p">:</span> <span class="s">&#39;k&#39;</span><span class="p">,</span>
+    <span class="s">&#39;milli&#39;</span><span class="p">:</span> <span class="s">&#39;m&#39;</span><span class="p">,</span> <span class="s">&#39;mega&#39;</span><span class="p">:</span> <span class="s">&#39;M&#39;</span><span class="p">,</span> <span class="s">&#39;giga&#39;</span><span class="p">:</span> <span class="s">&#39;G&#39;</span><span class="p">}</span>
+
+<div class="viewcode-block" id="translate"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxunitsinfo.translate">[docs]</a><span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">lastindex</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="c">#import pdb; pdb.set_trace()</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parts</span><span class="p">):</span>
+        <span class="n">newp</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="c">#look for long-form prefix</span>
+        <span class="k">for</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">prefixes</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">newp</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
+                <span class="n">newp</span> <span class="o">=</span> <span class="n">newp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="c">#look for basic translation:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">basics</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">newp</span> <span class="o">=</span> <span class="n">newp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="c">#replace ^ with **</span>
+        <span class="n">newp</span> <span class="o">=</span> <span class="n">newp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;^&#39;</span><span class="p">,</span> <span class="s">&#39;**&#39;</span><span class="p">)</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="n">answer</span> <span class="o">+</span>  <span class="n">newp</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">!=</span> <span class="n">lastindex</span><span class="p">):</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="n">answer</span> <span class="o">+</span> <span class="s">&#39; * &#39;</span>
+    <span class="k">return</span> <span class="n">answer</span>
+
+
+        
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span> <span class="c"># pragma: no cover</span>
+
+    <span class="kn">import</span> <span class="nn">openmdao.units.units</span>
+    <span class="c">#import pdb; pdb.set_trace()</span>
+
+    
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">openmdao</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">_unit_lib</span><span class="o">.</span><span class="n">unit_table</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="s">&#39;: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;s^-1&#39;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">translate</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="c">#import pdb; pdb.set_trace()</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">openmdao</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">_find_unit</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">s</span> <span class="o">+</span> <span class="s">&#39; = &#39;</span> <span class="o">+</span> <span class="n">t</span> <span class="o">+</span> <span class="s">&#39;: &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+    
+    <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;m^-1 s^-1&#39;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">translate</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">pdb</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">openmdao</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">_find_unit</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">s</span> <span class="o">+</span> <span class="s">&#39; = &#39;</span> <span class="o">+</span> <span class="n">t</span> <span class="o">+</span> <span class="s">&#39;: &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;centipoise&#39;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">translate</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">pdb</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">openmdao</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">_find_unit</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">s</span> <span class="o">+</span> <span class="s">&#39; = &#39;</span> <span class="o">+</span> <span class="n">t</span> <span class="o">+</span> <span class="s">&#39;: &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;kg&#39;</span><span class="p">,</span> <span class="s">&#39;mile hr^-1&#39;</span><span class="p">,</span> <span class="s">&#39;litre s^-1&#39;</span><span class="p">,</span> <span class="s">&#39;tonne s^-1&#39;</span><span class="p">,</span> <span class="s">&#39;centipoise&#39;</span><span class="p">,</span>
+              <span class="s">&#39;W m^-1 K^-1&#39;</span><span class="p">,</span> <span class="s">&#39;gallonUSliquid&#39;</span><span class="p">,</span> <span class="s">&#39;kilog&#39;</span><span class="p">,</span> <span class="s">&#39;nanos&#39;</span><span class="p">]:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">translate</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">openmdao</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">_find_unit</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="k">print</span> <span class="n">s</span> <span class="o">+</span> <span class="s">&#39; = &#39;</span> <span class="o">+</span> <span class="n">t</span> <span class="o">+</span> <span class="s">&#39;: &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">cfxwrapper 0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011-2013 Mechanical Solutions, Inc..
+      Last updated on Oct 30, 2013.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

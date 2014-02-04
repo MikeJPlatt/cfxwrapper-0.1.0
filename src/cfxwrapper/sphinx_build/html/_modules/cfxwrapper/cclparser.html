@@ -1,0 +1,665 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cfxwrapper.cclparser &mdash; cfxwrapper 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="cfxwrapper 0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">cfxwrapper 0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for cfxwrapper.cclparser</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">openmdao.util.filewrap</span> <span class="kn">import</span> <span class="n">FileParser</span>
+
+<span class="kn">import</span> <span class="nn">pprint</span>
+
+<span class="n">pp</span> <span class="o">=</span> <span class="n">pprint</span><span class="o">.</span><span class="n">PrettyPrinter</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<div class="viewcode-block" id="StringArrayParser"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.StringArrayParser">[docs]</a><span class="k">class</span> <span class="nc">StringArrayParser</span><span class="p">(</span><span class="n">FileParser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Like FileParser for an array of data strings.</span>
+<span class="sd">    Has methods for finding the *end_string* that matches an anchor.&quot;&quot;&quot;</span>
+    <span class="n">end_string</span> <span class="o">=</span> <span class="s">&#39;END&#39;</span>
+    <span class="n">start_string</span> <span class="o">=</span> <span class="s">&#39;:&#39;</span>
+    <span class="n">exclude_string</span> <span class="o">=</span> <span class="s">&#39;=&#39;</span> <span class="c"># when matching start and end,</span>
+                         <span class="c"># ignore lines containing exclude_string</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_array</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StringArrayParser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="c">#import pdb; pdb.set_trace()</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data_array</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_delimiters</span><span class="p">(</span><span class="s">&#39;= </span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)</span> <span class="c">#so we can split the key, value pairs</span>
+
+<div class="viewcode-block" id="StringArrayParser.strip_comments"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.StringArrayParser.strip_comments">[docs]</a>    <span class="k">def</span> <span class="nf">strip_comments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Strip CCL comments (starting with #) from a line.&quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c">#no comment</span>
+            <span class="k">return</span> <span class="n">line</span>
+        <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c">#whole line is a comment</span>
+            <span class="k">return</span> <span class="s">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">:</span> <span class="c"># the # is not escaped</span>
+                <span class="k">return</span> <span class="n">line</span><span class="p">[:</span><span class="n">index</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">strip_comments</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="StringArrayParser.preprocess"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.StringArrayParser.preprocess">[docs]</a>    <span class="k">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handles continuation lines ending with \</span>
+<span class="sd">           and comments starting with non-escaped #.</span>
+<span class="sd">           Removes blank lines and trailing white space.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strip_comments</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">:</span>
+                    <span class="c">#don&#39;t process a continuation on the last line</span>
+                    <span class="c">#import pdb; pdb.set_trace()</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="c">#import pdb; pdb.set_trace()</span>
+
+            </div>
+<div class="viewcode-block" id="StringArrayParser.set_end_string"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.StringArrayParser.set_end_string">[docs]</a>    <span class="k">def</span> <span class="nf">set_end_string</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the end string to use for matching.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_string</span> <span class="o">=</span> <span class="n">e</span>
+</div>
+<div class="viewcode-block" id="StringArrayParser.set_start_string"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.StringArrayParser.set_start_string">[docs]</a>    <span class="k">def</span> <span class="nf">set_start_string</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the start string to use for matching.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_string</span> <span class="o">=</span> <span class="n">e</span></div>
+<div class="viewcode-block" id="StringArrayParser.set_exclude_string"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.StringArrayParser.set_exclude_string">[docs]</a>    <span class="k">def</span> <span class="nf">set_exclude_string</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the exclude string to use for matching.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exclude_string</span> <span class="o">=</span> <span class="n">e</span>
+   </div>
+<div class="viewcode-block" id="StringArrayParser.find_end"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.StringArrayParser.find_end">[docs]</a>    <span class="k">def</span> <span class="nf">find_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Finds end row in data that matches *current_row*.</span>
+<span class="sd">        </span>
+<span class="sd">        Does not change the anchor.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns -1 if not found.&quot;&quot;&quot;</span>
+        
+        <span class="n">endrow</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">depth</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_row</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="c">#import pdb; pdb.set_trace()</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exclude_string</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="c"># don&#39;t ignore line    </span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_string</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">depth</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="c">#print str(depth) + &#39;[&#39; + line + &#39;]&#39;</span>
+                <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end_string</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">depth</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="c">#print str(depth) + &#39;[&#39; + line + &#39;]&#39;</span>
+                <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">endrow</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">break</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c">#import pdb; pdb.set_trace()</span>
+        <span class="k">return</span> <span class="n">endrow</span>
+</div>
+<div class="viewcode-block" id="StringArrayParser.mark_anchor_withs"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.StringArrayParser.mark_anchor_withs">[docs]</a>    <span class="k">def</span> <span class="nf">mark_anchor_withs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">anchor</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">sr</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mark_anchor</span><span class="p">(</span><span class="n">anchor</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">done</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="c">#import pdb; pdb.set_trace()</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mark_anchor</span><span class="p">(</span><span class="n">anchor</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_row</span> <span class="o">&gt;=</span> <span class="n">sr</span><span class="p">:</span>
+                    <span class="n">done</span> <span class="o">=</span> <span class="bp">True</span>
+            </div>
+<div class="viewcode-block" id="StringArrayParser.find_range"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.StringArrayParser.find_range">[docs]</a>    <span class="k">def</span> <span class="nf">find_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">anchor</span><span class="p">,</span> <span class="n">sr</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Finds the start and end rows in data for the entity that starts with *anchor*.</span>
+<span class="sd">        </span>
+<span class="sd">        Leaves the anchor set at the line that contains ``anchor``.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns startrow and endrow. Returns -1 for both if anchor is not found.&quot;&quot;&quot;</span>
+        <span class="n">startrow</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">endrow</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mark_anchor_withs</span><span class="p">(</span><span class="n">anchor</span><span class="p">,</span> <span class="n">sr</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span> <span class="c">#anchor not found</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">startrow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_row</span>
+            <span class="n">endrow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_end</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">startrow</span><span class="p">,</span> <span class="n">endrow</span>
+        </div></div>
+<div class="viewcode-block" id="do_logging"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.do_logging">[docs]</a><span class="k">def</span> <span class="nf">do_logging</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">both</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">both</span> <span class="ow">or</span> <span class="n">logger</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">msg</span>
+    <span class="k">if</span> <span class="n">logger</span> <span class="o">&lt;&gt;</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CCLEntityParser"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLEntityParser">[docs]</a><span class="k">class</span> <span class="nc">CCLEntityParser</span><span class="p">(</span><span class="n">StringArrayParser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Puts ANSYS CFX CCL information into a dictionary structure.</span>
+
+<span class="sd">        Lines containing &#39;&#39;=&#39;&#39; will be put into the top-level dictionary.</span>
+<span class="sd">        </span>
+<span class="sd">        Lines containing &#39;&#39;:&#39;&#39; signify the start of a sub-dictionary.&quot;&quot;&quot;</span>
+    <span class="n">dictionary</span> <span class="o">=</span> <span class="p">{}</span> <span class="c">#empty dictionary</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_array</span><span class="p">,</span> <span class="n">logger</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CCLEntityParser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">data_array</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dictionary</span> <span class="o">=</span> <span class="p">{}</span> <span class="c">#empty dictionary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+
+<div class="viewcode-block" id="CCLEntityParser.parse"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLEntityParser.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="s">&quot;Fill the dictionary.&quot;</span>
+        <span class="c">#print &#39;Parse depth &#39; + str(depth) + &#39; data: &#39;</span>
+        <span class="c">#for s in self.data: print s</span>
+        <span class="c">#import pdb; pdb.set_trace()</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_row</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;=&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span> <span class="c">#put into dictionary</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="c">#print &#39;Parse depth &#39; + str(depth) + &#39; key &#39; + key + &#39; value &#39; + value</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">anchor</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="c">#import pdb; pdb.set_trace()</span>
+                    <span class="n">endrow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_end</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">endrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                        <span class="n">do_logging</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="s">&#39;Could not find end matching &#39;</span> <span class="o">+</span> <span class="n">anchor</span><span class="p">,</span> <span class="n">both</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+                        <span class="k">break</span>
+                    <span class="c">#print &#39;Parse depth &#39; +str(depth) + &#39; anchor &#39; + anchor</span>
+                    <span class="c">#import pdb; pdb.set_trace()</span>
+                    <span class="n">subparser</span> <span class="o">=</span> <span class="n">CCLEntityParser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">endrow</span><span class="p">])</span>
+                    <span class="n">subparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">depth</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                    
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dictionary</span><span class="p">[</span><span class="n">anchor</span><span class="p">]</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">dictionary</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="n">endrow</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">do_logging</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="s">&#39;Unexpected line &#39;</span> <span class="o">+</span> <span class="n">line</span> <span class="o">+</span> <span class="s">&#39; depth &#39;</span> <span class="o">+</span> <span class="n">depth</span><span class="p">,</span> <span class="n">both</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+                    <span class="kn">import</span> <span class="nn">pdb</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+</div></div>
+<div class="viewcode-block" id="Boundary"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.Boundary">[docs]</a><span class="k">class</span> <span class="nc">Boundary</span><span class="p">:</span> 
+    <span class="sd">&quot;&quot;&quot;Holds info about a CFX Boundary.&quot;&quot;&quot;</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span> <span class="c"># empty dictionary</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="c">#import pdb; pdb.set_trace()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="k">if</span> <span class="s">&#39;Boundary Type&#39;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;Boundary Type&#39;</span><span class="p">]</span>
+<div class="viewcode-block" id="Boundary.output"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.Boundary.output">[docs]</a>    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;Boundary: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">+</span> <span class="s">&#39;: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">&#39; attributes: &#39;</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">pp</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+        </div>
+<div class="viewcode-block" id="Boundary.get_location_names"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.Boundary.get_location_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_location_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loc_dict</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s">&#39;Location&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">:</span>
+            <span class="n">loc_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s">&#39;Location&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">loc_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        
+</div></div>
+<div class="viewcode-block" id="Domain"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.Domain">[docs]</a><span class="k">class</span> <span class="nc">Domain</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Holds info about a CFX Domain.&quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">domaintype</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">location</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">inlets</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+    <span class="n">outlets</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+    <span class="n">openings</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+    <span class="n">interfaces</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+    <span class="n">walls</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+    <span class="n">symmetries</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inlets</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outlets</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">openings</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interfaces</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">walls</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symmetries</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+<div class="viewcode-block" id="Domain.output"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.Domain.output">[docs]</a>    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span>  <span class="s">&#39;Domain: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">&quot; type: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">domaintype</span> <span class="o">+</span> <span class="s">&#39; location: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">Inlets:&#39;</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inlets</span><span class="p">:</span> <span class="n">s</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">Outlets:&#39;</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outlets</span><span class="p">:</span> <span class="n">s</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">Openings:&#39;</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">openings</span><span class="p">:</span> <span class="n">s</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">Interfaces:&#39;</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">interfaces</span><span class="p">:</span> <span class="n">s</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">Walls:&#39;</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">walls</span><span class="p">:</span> <span class="n">s</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">Symmetries:&#39;</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetries</span><span class="p">:</span> <span class="n">s</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">End of Domain &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="k">return</span> <span class="n">s</span>
+        </div>
+<div class="viewcode-block" id="Domain.get_location_names"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.Domain.get_location_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_location_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_loc_dict</span><span class="p">,</span> <span class="n">b_loc_dict</span><span class="p">):</span>
+        <span class="n">d_loc_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inlets</span><span class="p">:</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Boundary</span><span class="p">)</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">get_location_names</span><span class="p">(</span><span class="n">b_loc_dict</span><span class="p">)</span>   
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outlets</span><span class="p">:</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Boundary</span><span class="p">)</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">get_location_names</span><span class="p">(</span><span class="n">b_loc_dict</span><span class="p">)</span>   
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">openings</span><span class="p">:</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Boundary</span><span class="p">)</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">get_location_names</span><span class="p">(</span><span class="n">b_loc_dict</span><span class="p">)</span>   
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">interfaces</span><span class="p">:</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Boundary</span><span class="p">)</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">get_location_names</span><span class="p">(</span><span class="n">b_loc_dict</span><span class="p">)</span>   
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">walls</span><span class="p">:</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Boundary</span><span class="p">)</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">get_location_names</span><span class="p">(</span><span class="n">b_loc_dict</span><span class="p">)</span>   
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">symmetries</span><span class="p">:</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Boundary</span><span class="p">)</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">get_location_names</span><span class="p">(</span><span class="n">b_loc_dict</span><span class="p">)</span>   </div></div>
+<div class="viewcode-block" id="Flow"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.Flow">[docs]</a><span class="k">class</span> <span class="nc">Flow</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Holds info about a CFX Flow entity.&quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">units</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+    <span class="n">domains</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+    <span class="n">monitorpoints</span> <span class="o">=</span> <span class="p">{}</span> <span class="c">#empty dictionary</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domains</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monitorpoints</span> <span class="o">=</span> <span class="p">{}</span> <span class="c">#empty dictionary</span>
+<div class="viewcode-block" id="Flow.output"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.Flow.output">[docs]</a>    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;Flow: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">Units:&#39;</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">pp</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">Domains:&#39;</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="n">d</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s">&#39;Monitor Points:&#39;</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">pp</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">monitorpoints</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s">&#39;End of Flow &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="n">s</span>
+        </div>
+<div class="viewcode-block" id="Flow.get_location_names"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.Flow.get_location_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_location_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_loc_dict</span><span class="p">,</span> <span class="n">b_loc_dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">:</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">Domain</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">get_location_names</span><span class="p">(</span><span class="n">d_loc_dict</span><span class="p">,</span> <span class="n">b_loc_dict</span><span class="p">)</span>
+            </div>
+<div class="viewcode-block" id="Flow.get_length_units"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.Flow.get_length_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_length_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&#39;Length Units&#39;</span> <span class="ow">in</span> <span class="n">u</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="s">&#39;Length Units&#39;</span><span class="p">]</span>
+                <span class="n">units</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s">&#39;[&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;]&#39;</span><span class="p">))</span>
+</div></div>
+<div class="viewcode-block" id="CCLParser"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLParser">[docs]</a><span class="k">class</span> <span class="nc">CCLParser</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;A Parser for an ANSYS CFX CCL file.</span>
+<span class="sd">       </span>
+<span class="sd">        The CCL file is generated by ANSYS CFX-Pre: File-&gt;Export-&gt;CCL.</span>
+<span class="sd">          </span>
+<span class="sd">        CCLParser looks for definitions of ANSYS CFX entities to expose</span>
+<span class="sd">        to the wrapper.</span>
+
+<span class="sd">        See CFX Reference Guide Section 12.1 for CCL syntax</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">expressions</span> <span class="o">=</span> <span class="p">{}</span> <span class="c"># empty dictionary</span>
+    <span class="n">flows</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+    <span class="n">location_dictionary</span> <span class="o">=</span> <span class="p">{}</span> <span class="c">#empty dictionary</span>
+    <span class="n">units</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span> <span class="c">#empty set</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">logger</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="n">StringArrayParser</span><span class="p">([],</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flows</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expressions</span> <span class="o">=</span> <span class="p">{}</span> <span class="c"># empty dictionary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain_location_dictionary</span> <span class="o">=</span> <span class="p">{}</span> <span class="c">#empty dictionary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">boundary_location_dictionary</span> <span class="o">=</span> <span class="p">{}</span> <span class="c">#empty dictionary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span> <span class="c">#empty set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+        
+<div class="viewcode-block" id="CCLParser.getlibrary_parser"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLParser.getlibrary_parser">[docs]</a>    <span class="k">def</span> <span class="nf">getlibrary_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a parser for just the LIBRARY section of the CCL file.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">reset_anchor</span><span class="p">()</span>
+        <span class="n">anchor</span> <span class="o">=</span> <span class="s">&#39;LIBRARY:&#39;</span>
+        <span class="n">startrow</span><span class="p">,</span> <span class="n">endrow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">find_range</span><span class="p">(</span><span class="n">anchor</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">startrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">endrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">library_parser</span> <span class="o">=</span> <span class="n">StringArrayParser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startrow</span><span class="p">:</span><span class="n">endrow</span><span class="p">])</span>
+            <span class="k">return</span> <span class="bp">True</span>
+</div>
+<div class="viewcode-block" id="CCLParser.getexpressions"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLParser.getexpressions">[docs]</a>    <span class="k">def</span> <span class="nf">getexpressions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get expressions defined in LIBRARY:CEL:EXPRESSIONS:&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">library_parser</span><span class="o">.</span><span class="n">reset_anchor</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">startrow</span><span class="p">,</span> <span class="n">endrow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">library_parser</span><span class="o">.</span><span class="n">find_range</span><span class="p">(</span><span class="s">&#39;CEL:&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">startrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">endrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> 
+                <span class="k">return</span> <span class="bp">False</span>
+            <span class="n">cel_parser</span> <span class="o">=</span> <span class="n">StringArrayParser</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">library_parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startrow</span><span class="p">:</span><span class="n">endrow</span><span class="p">])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">startrow</span><span class="p">,</span> <span class="n">endrow</span> <span class="o">=</span> <span class="n">cel_parser</span><span class="o">.</span><span class="n">find_range</span><span class="p">(</span><span class="s">&#39;EXPRESSIONS:&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">startrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">endrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">False</span>
+                <span class="n">expr_parser</span> <span class="o">=</span> <span class="n">CCLEntityParser</span><span class="p">(</span><span class="n">cel_parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startrow</span><span class="p">:</span><span class="n">endrow</span><span class="p">])</span>
+                <span class="n">expr_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">expressions</span> <span class="o">=</span> <span class="n">expr_parser</span><span class="o">.</span><span class="n">dictionary</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span> <span class="c">#anchor not found</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span> <span class="c">#anchor not found</span>
+            <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="CCLParser.getflow_parser"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLParser.getflow_parser">[docs]</a>    <span class="k">def</span> <span class="nf">getflow_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a parser for just the FLOW section of the CCL file.&quot;&quot;&quot;</span>
+        <span class="n">anchor</span> <span class="o">=</span> <span class="s">&#39;FLOW:&#39;</span>
+        <span class="n">startrow</span><span class="p">,</span> <span class="n">endrow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">find_range</span><span class="p">(</span><span class="n">anchor</span><span class="p">,</span> <span class="n">sr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">startrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">endrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flow_parser</span> <span class="o">=</span> <span class="n">StringArrayParser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startrow</span><span class="p">:</span><span class="n">endrow</span><span class="p">])</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getname</span><span class="p">(</span><span class="s">&#39;FLOW:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow_parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">name</span><span class="p">,</span> <span class="n">endrow</span>
+       </div>
+<div class="viewcode-block" id="CCLParser.getunits"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLParser.getunits">[docs]</a>    <span class="k">def</span> <span class="nf">getunits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get SOLUTION UNITS defined in the flow.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flow_parser</span><span class="o">.</span><span class="n">reset_anchor</span><span class="p">()</span>
+            <span class="n">startrow</span><span class="p">,</span> <span class="n">endrow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow_parser</span><span class="o">.</span><span class="n">find_range</span><span class="p">(</span>
+                <span class="s">&#39;SOLUTION UNITS:&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">startrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">endrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> 
+                <span class="k">return</span>
+            <span class="c">#import pdb; pdb.set_trace()</span>
+            <span class="n">units_parser</span> <span class="o">=</span> <span class="n">CCLEntityParser</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">flow_parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startrow</span><span class="p">:</span><span class="n">endrow</span><span class="p">])</span>
+            <span class="n">units_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
+            <span class="n">flow</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">units_parser</span><span class="o">.</span><span class="n">dictionary</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span> <span class="c">#anchor not found</span>
+            <span class="k">return</span>
+        <span class="c">#end of getunits</span>
+</div>
+<div class="viewcode-block" id="CCLParser.getname"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLParser.getname">[docs]</a>    <span class="k">def</span> <span class="nf">getname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">anchor</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the name defined on the line after *anchor*.&quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">anchor</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">anchor</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">name</span>
+</div>
+<div class="viewcode-block" id="CCLParser.getdomains"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLParser.getdomains">[docs]</a>    <span class="k">def</span> <span class="nf">getdomains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get information about the Domains defined in the flow.</span>
+<span class="sd">           In particular, get Boundary and Monitor Point information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">sr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">flow_parser</span><span class="o">.</span><span class="n">reset_anchor</span><span class="p">()</span>
+                <span class="n">startrow</span><span class="p">,</span> <span class="n">endrow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow_parser</span><span class="o">.</span><span class="n">find_range</span><span class="p">(</span><span class="s">&#39;DOMAIN:&#39;</span><span class="p">,</span> <span class="n">sr</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">startrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">endrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> 
+                    <span class="k">break</span>
+                <span class="c">#import pdb; pdb.set_trace()</span>
+                <span class="n">sr</span> <span class="o">=</span> <span class="n">endrow</span>
+                <span class="n">domain_parser</span> <span class="o">=</span> <span class="n">StringArrayParser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flow_parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startrow</span><span class="p">:</span><span class="n">endrow</span><span class="p">])</span>
+                
+                <span class="c">#get the domain name from the first line</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getname</span><span class="p">(</span><span class="s">&#39;DOMAIN:&#39;</span><span class="p">,</span> <span class="n">domain_parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">dmn</span> <span class="o">=</span> <span class="n">Domain</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                
+                <span class="c">#get the Domain Type</span>
+                <span class="c">#import pdb; pdb.set_trace()</span>
+                <span class="n">dmn</span><span class="o">.</span><span class="n">domaintype</span> <span class="o">=</span> <span class="n">domain_parser</span><span class="o">.</span><span class="n">transfer_keyvar</span><span class="p">(</span><span class="s">&#39;Domain Type&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">dmn</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">domain_parser</span><span class="o">.</span><span class="n">transfer_keyvar</span><span class="p">(</span><span class="s">&#39;Location&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            
+                <span class="c">#print &#39;Domain &#39; + dmn.name + &#39; &#39; + dmn.domaintype + &#39; startrow &#39; + str(domain_startrow) + \</span>
+                    <span class="c">#&#39; endrow &#39; + str(domain_endrow)</span>
+                
+                <span class="c"># look for boundaries</span>
+                <span class="n">anchor</span> <span class="o">=</span> <span class="s">&quot;BOUNDARY:&quot;</span>
+                <span class="c">#n = len(anchor)</span>
+                <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                    <span class="c">#import pdb; pdb.set_trace()</span>
+                    <span class="n">startrow</span><span class="p">,</span> <span class="n">endrow</span> <span class="o">=</span> <span class="n">domain_parser</span><span class="o">.</span><span class="n">find_range</span><span class="p">(</span><span class="n">anchor</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">startrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">endrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> 
+                        <span class="k">break</span>
+                    <span class="n">boundary_parser</span> <span class="o">=</span> <span class="n">CCLEntityParser</span><span class="p">(</span><span class="n">domain_parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startrow</span><span class="p">:</span><span class="n">endrow</span><span class="p">])</span>
+                    <span class="c">#get the boundary name from the first line</span>
+                    <span class="c">#import pdb; pdb.set_trace()</span>
+                    <span class="c">#line = boundary_parser.data[boundary_parser.current_row].strip()</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getname</span><span class="p">(</span><span class="n">anchor</span><span class="p">,</span> <span class="n">boundary_parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">boundary_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
+                    <span class="c">#import pdb; pdb.set_trace()</span>
+                    <span class="n">b</span> <span class="o">=</span> <span class="n">Boundary</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">boundary_parser</span><span class="o">.</span><span class="n">dictionary</span><span class="p">)</span>
+                    <span class="n">btype</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">type</span>
+                    <span class="c">#print &#39;Boundary &#39; + name + &#39; &#39; + btype + &#39; startrow &#39; + str(boundary_startrow) + \</span>
+                        <span class="c">#&#39; endrow &#39; + str(boundary_endrow)</span>
+                    <span class="k">if</span> <span class="n">btype</span> <span class="o">==</span> <span class="s">&#39;INLET&#39;</span><span class="p">:</span>
+                        <span class="n">dmn</span><span class="o">.</span><span class="n">inlets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">btype</span> <span class="o">==</span> <span class="s">&#39;OUTLET&#39;</span><span class="p">:</span>
+                        <span class="n">dmn</span><span class="o">.</span><span class="n">outlets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">btype</span> <span class="o">==</span> <span class="s">&#39;OPENING&#39;</span><span class="p">:</span>
+                        <span class="n">dmn</span><span class="o">.</span><span class="n">openings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">btype</span> <span class="o">==</span> <span class="s">&#39;WALL&#39;</span><span class="p">:</span>
+                        <span class="n">dmn</span><span class="o">.</span><span class="n">walls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">btype</span> <span class="o">==</span> <span class="s">&#39;INTERFACE&#39;</span><span class="p">:</span>
+                        <span class="n">dmn</span><span class="o">.</span><span class="n">interfaces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">btype</span> <span class="o">==</span> <span class="s">&#39;SYMMETRY&#39;</span><span class="p">:</span>
+                        <span class="n">dmn</span><span class="o">.</span><span class="n">symmetries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">do_logging</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="s">&#39;Domain &#39;</span> <span class="o">+</span> <span class="n">dmn</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">&#39;: Boundary &#39;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&#39;: unknown type &#39;</span> <span class="o">+</span> <span class="n">btype</span><span class="p">,</span> <span class="n">both</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+                
+                <span class="n">flow</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dmn</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span> <span class="c">#anchor not found</span>
+                <span class="k">break</span>
+               </div>
+<div class="viewcode-block" id="CCLParser.getmonitorpoints"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLParser.getmonitorpoints">[docs]</a>    <span class="k">def</span> <span class="nf">getmonitorpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get monitor points defined in FLOW: OUTPUT CONTROL: MONITOR OBJECTS:&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flow_parser</span><span class="o">.</span><span class="n">reset_anchor</span><span class="p">()</span>
+        <span class="n">startrow</span><span class="p">,</span> <span class="n">endrow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow_parser</span><span class="o">.</span><span class="n">find_range</span><span class="p">(</span><span class="s">&#39;OUTPUT CONTROL:&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">startrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">endrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">oc_parser</span> <span class="o">=</span> <span class="n">StringArrayParser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flow_parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startrow</span><span class="p">:</span><span class="n">endrow</span><span class="p">])</span>
+        <span class="n">startrow</span><span class="p">,</span> <span class="n">endrow</span> <span class="o">=</span> <span class="n">oc_parser</span><span class="o">.</span><span class="n">find_range</span><span class="p">(</span><span class="s">&#39;MONITOR OBJECTS:&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">startrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">endrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">mo_parser</span> <span class="o">=</span> <span class="n">StringArrayParser</span><span class="p">(</span><span class="n">oc_parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startrow</span><span class="p">:</span><span class="n">endrow</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mo_parser</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+            <span class="n">do_logging</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;, &#39;</span> <span class="o">+</span> <span class="n">l</span><span class="p">)</span>
+
+        <span class="n">anchor</span> <span class="o">=</span> <span class="s">&quot;MONITOR POINT:&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">anchor</span><span class="p">)</span>
+        <span class="n">sr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">mo_parser</span><span class="o">.</span><span class="n">reset_anchor</span><span class="p">()</span>
+                <span class="n">startrow</span><span class="p">,</span> <span class="n">endrow</span> <span class="o">=</span> <span class="n">mo_parser</span><span class="o">.</span><span class="n">find_range</span><span class="p">(</span><span class="n">anchor</span><span class="p">,</span> <span class="n">sr</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">startrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">endrow</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> 
+                    <span class="k">break</span>
+                <span class="n">sr</span> <span class="o">=</span> <span class="n">endrow</span>
+                <span class="n">monitorpoints_parser</span> <span class="o">=</span> <span class="n">StringArrayParser</span><span class="p">(</span><span class="n">mo_parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">startrow</span><span class="p">:</span><span class="n">endrow</span><span class="p">])</span>
+                <span class="c">#import pdb; pdb.set_trace()</span>
+                <span class="c">#get the monitor name from the marked line</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">monitorpoints_parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="c">#if name == &#39;MonAmpere&#39;: import pdb; pdb.set_trace()</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span> <span class="c">#empty dictionary</span>
+                <span class="n">keys</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;Expression Value&#39;</span><span class="p">,</span> <span class="s">&#39;Option&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">monitorpoints_parser</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>  <span class="c"># look at the remaining lines for keys</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                            <span class="n">s</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+                            <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;=&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+                            <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>                        
+                <span class="c">#for i, k in enumerate(keys, 1):</span>
+                    <span class="c">#monitorpoints_parser.reset_anchor()</span>
+                    <span class="c">#line = monitorpoints_parser.transfer_line(i)</span>
+                    <span class="c">#if k in line:</span>
+                        <span class="c">#s = line.replace(k, &#39;&#39;)</span>
+                        <span class="c">#s = s.replace(&#39;=&#39;, &#39;&#39;)</span>
+                        <span class="c">#d[k] = s.strip()</span>
+                <span class="n">flow</span><span class="o">.</span><span class="n">monitorpoints</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span> <span class="c">#anchor not found</span>
+                <span class="k">break</span>
+       <span class="c">#end of getmonitorpoints</span>
+            </div>
+<div class="viewcode-block" id="CCLParser.output"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLParser.output">[docs]</a>    <span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;EXPRESSIONS:</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">expressions</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="n">k</span> <span class="o">+</span> <span class="s">&#39;: &#39;</span> <span class="o">+</span> <span class="n">v</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+        
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flows</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="n">f</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">s</span>
+            </div>
+<div class="viewcode-block" id="CCLParser.parse"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLParser.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do_location_dictionary</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">do_length_units</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+        <span class="s">&#39;&#39;&quot;Parse the CCL File.&quot;&quot;&quot;</span>
+        <span class="c">#Parse LIBRARY: section (just expressions for now)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getlibrary_parser</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getexpressions</span><span class="p">()</span>
+        
+        <span class="c">#Parse FLOW: sections</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">reset_anchor</span><span class="p">()</span>
+        <span class="n">sr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flows</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#emptylist</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="c">#import pdb; pdb.set_trace()</span>
+            <span class="n">flowname</span><span class="p">,</span> <span class="n">endrow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getflow_parser</span><span class="p">(</span><span class="n">sr</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">flowname</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">flow</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="n">flowname</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getunits</span><span class="p">(</span><span class="n">flow</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getdomains</span><span class="p">(</span><span class="n">flow</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getmonitorpoints</span><span class="p">(</span><span class="n">flow</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flow</span><span class="p">)</span>
+            <span class="n">sr</span> <span class="o">=</span> <span class="n">endrow</span>
+        <span class="k">if</span> <span class="n">do_location_dictionary</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_location_dictionary</span><span class="p">(</span><span class="n">debug</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">do_length_units</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_length_units</span><span class="p">(</span><span class="n">debug</span><span class="p">)</span>
+            </div>
+<div class="viewcode-block" id="CCLParser.get_location_dictionary"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLParser.get_location_dictionary">[docs]</a>    <span class="k">def</span> <span class="nf">get_location_dictionary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flows</span><span class="p">:</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Flow</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">get_location_names</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_location_dictionary</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_location_dictionary</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span> 
+            <span class="n">do_logging</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="s">&#39;Domain Location Dictionary:&#39;</span><span class="p">)</span>
+            <span class="n">do_logging</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">pp</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain_location_dictionary</span><span class="p">))</span>
+            <span class="n">do_logging</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="s">&#39;Boundary Location Dictionary:&#39;</span><span class="p">)</span>
+            <span class="n">do_logging</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">pp</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">boundary_location_dictionary</span><span class="p">)</span>  <span class="p">)</span>          
+    </div>
+<div class="viewcode-block" id="CCLParser.get_length_units"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cclparser.CCLParser.get_length_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_length_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flows</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">get_length_units</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="n">do_logging</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="s">&#39;Units:&#39;</span> <span class="p">)</span>
+            <span class="n">do_logging</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">pp</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">))</span>
+       </div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span> <span class="c"># pragma: no cover</span>
+    
+    <span class="kn">import</span> <span class="nn">os</span>
+
+    <span class="n">base</span> <span class="o">=</span> <span class="s">&#39;C:/Projects/MUTT/MUTT_PhaseII/&#39;</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="s">&#39;MSI_FSI_Examples/MSI_Pump_Case/Case_5/CFX/MSI_pumpLoop_Impeller.ccl&#39;</span>
+    <span class="n">cclp1</span> <span class="o">=</span> <span class="n">CCLParser</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+    <span class="n">cclp1</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
+    <span class="k">print</span> <span class="n">cclp1</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+    <span class="k">print</span> <span class="s">&#39;End of parse2&#39;</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">cfxwrapper 0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011-2013 Mechanical Solutions, Inc..
+      Last updated on Oct 30, 2013.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

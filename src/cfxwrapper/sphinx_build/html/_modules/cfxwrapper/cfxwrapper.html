@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cfxwrapper.cfxwrapper &mdash; cfxwrapper 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="cfxwrapper 0.1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">cfxwrapper 0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for cfxwrapper.cfxwrapper</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">openmdao.main.api</span> <span class="kn">import</span> <span class="n">Component</span>
+<span class="kn">from</span> <span class="nn">openmdao.lib.datatypes.api</span> <span class="kn">import</span> <span class="n">Float</span><span class="p">,</span> <span class="n">Str</span>
+<span class="kn">from</span> <span class="nn">openmdao.lib.components.api</span> <span class="kn">import</span> <span class="n">ExternalCode</span>
+
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">cclparser</span>
+<span class="kn">import</span> <span class="nn">cfxunitsinfo</span>
+
+<span class="k">class</span> <span class="nc">CFXWrapper</span><span class="p">(</span><span class="n">ExternalCode</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for wrappers for ANSYS CFX.  Is only used by a generated CFX Wrapper.  See cfxwrappergenerator.GenerateCFXWrapper.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CFXWrapper"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxwrapper.CFXWrapper">[docs]</a>    <span class="n">newdeffile</span> <span class="o">=</span> <span class="n">Str</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s">&#39;a new CFX .def file to use instead of the original, can be used to apply deflections to all nodes&#39;</span><span class="p">,</span> 
+                     <span class="n">iotype</span><span class="o">=</span><span class="s">&#39;in&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CFXWrapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputvals</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list of floats, set in subclass execute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputvals</span> <span class="o">=</span> <span class="p">[]</span> <span class="c">#empty list - set in execute, used in subclass execute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span> <span class="c">#empty dictionary to cache calculations        </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfxpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ansyspath</span><span class="p">,</span> <span class="s">&#39;CFX&#39;</span><span class="p">,</span> <span class="s">&#39;bin&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cclfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">+</span> <span class="s">&#39;.ccl&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fullname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">+</span> <span class="s">&#39;mon.txt&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solvecmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfxpath</span><span class="p">,</span> <span class="s">&#39;cfx5solve.exe&#39;</span><span class="p">),</span>
+                       <span class="s">&#39;-def&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deffile</span><span class="p">,</span>
+                       <span class="s">&#39;-ccl&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cclfile</span><span class="p">,</span>
+                       <span class="s">&#39;-fullname&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullname</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readmoncmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfxpath</span><span class="p">,</span> <span class="s">&#39;cfx5mondata.exe&#39;</span><span class="p">),</span>
+                  <span class="s">&#39;-res&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullname</span> <span class="o">+</span> <span class="s">&#39;.res&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;-lastvaluesonly&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;-varrule&#39;</span><span class="p">,</span> <span class="s">&#39;CATEGORY = USER POINT&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;-out&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">monfile</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cachefile</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="c">#import pdb; pdb.set_trace()</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cachefile</span><span class="p">):</span>
+                <span class="n">cachepickle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cachefile</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cachepickle</span><span class="p">)</span>
+                <span class="n">cachepickle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">print</span> <span class="s">&#39;Loaded cache &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cachefile</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cachefile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">+</span> <span class="s">&#39;Cache.txt&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">origresfile</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="c">#get the original values</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfxpath</span><span class="p">,</span> <span class="s">&#39;cfx5mondata.exe&#39;</span><span class="p">),</span>
+                  <span class="s">&#39;-res&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">origresfile</span><span class="p">,</span>
+                  <span class="s">&#39;-lastvaluesonly&#39;</span><span class="p">,</span>
+                   <span class="s">&#39;-varrule&#39;</span><span class="p">,</span> <span class="s">&#39;CATEGORY = USER POINT&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;-out&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">monfile</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">readmon</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+            <span class="c">#import pdb; pdb.set_trace()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputvals</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputvals</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&#39;Updated cache from origresfile&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">origresfile</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">)</span>
+
+            
+        <span class="c">#Info output</span>
+        <span class="k">print</span> <span class="s">&#39;Working Dir &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">workdir</span>
+        <span class="k">print</span> <span class="s">&#39;Base File Name &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span>
+        <span class="k">print</span> <span class="s">&#39;CFX Path &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfxpath</span>
+        <span class="k">print</span> <span class="s">&#39;CFX Input File &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">deffile</span>
+        <span class="k">print</span> <span class="s">&#39;Generated CCL File &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cclfile</span>
+        <span class="k">print</span> <span class="s">&#39;Base for CFX Output &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullname</span>
+        <span class="k">print</span> <span class="s">&#39;Solve Command &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solvecmd</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&#39;Read Monitor Command &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">readmoncmd</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&#39;Possible Variables:&#39;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">possibleins</span><span class="p">:</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">possibleouts</span><span class="p">:</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="k">print</span> <span class="s">&#39;Cache file &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cachefile</span>
+
+    <span class="k">def</span> <span class="nf">picklecache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">picklefile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cachefile</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="CFXWrapper.picklecache"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxwrapper.CFXWrapper.picklecache">[docs]</a>        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">,</span> <span class="n">picklefile</span><span class="p">)</span>
+        <span class="n">picklefile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">readmon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="n">cmd</span></div>
+<div class="viewcode-block" id="CFXWrapper.readmon"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxwrapper.CFXWrapper.readmon">[docs]</a>        <span class="k">try</span><span class="p">:</span>
+            <span class="c">#import pdb; pdb.set_trace()</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">CFXWrapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Error in &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">readmoncmd</span><span class="p">)</span>
+            <span class="k">print</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_code</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c"># parse the self.monfile</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">monfile</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;Problem opening monitor file &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">monfile</span>
+                    <span class="k">print</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">return_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+                    <span class="c">#import pdb; pdb.set_trace()</span>
+                    <span class="n">nameline</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;USER POINT,&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">nameline</span> <span class="o">=</span> <span class="n">nameline</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">nameline</span> <span class="o">=</span> <span class="n">nameline</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="n">names</span> <span class="o">=</span> <span class="n">nameline</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+                    <span class="n">valline</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="n">vals</span> <span class="o">=</span> <span class="n">valline</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+                    <span class="n">numvals</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+                    <span class="n">numnames</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+                    <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">numnames</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; names; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">numvals</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; vals&#39;</span>
+                    <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span> <span class="c">#empty dictionary</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numvals</span><span class="p">:</span>
+                            <span class="nb">dict</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        
+                    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+                    <span class="c"># set outputvals</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">outputvals</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">possibleouts</span><span class="p">:</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">name</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">valstr</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                            <span class="c">#import pdb; pdb.set_trace()</span>
+                            <span class="k">print</span> <span class="s">&#39;Could not find monitor point &#39;</span> <span class="o">+</span> <span class="n">o</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> \
+                                  <span class="s">&#39; in &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">monfile</span>
+                            <span class="k">print</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="n">val</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="s">&#39;nan&#39;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">val</span><span class="p">,</span> <span class="n">isnum</span> <span class="o">=</span> <span class="n">cfxunitsinfo</span><span class="o">.</span><span class="n">get_number</span><span class="p">(</span><span class="n">valstr</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="n">isnum</span><span class="p">:</span>
+                                <span class="c">#import pdb; pdb.set_trace()</span>
+                                <span class="k">print</span> <span class="s">&#39;Value for monitor point &#39;</span> <span class="o">+</span> <span class="n">o</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> \
+                                  <span class="s">&#39; in &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">monfile</span> <span class="o">+</span> <span class="s">&#39; is not a number&#39;</span>
+                                <span class="n">val</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="s">&#39;nan&#39;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">outputvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                        <span class="k">print</span> <span class="n">o</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s">&#39; = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">use_old_df</span> <span class="o">=</span> <span class="bp">False</span></div>
+<div class="viewcode-block" id="CFXWrapper.execute"><a class="viewcode-back" href="../../srcdocs.html#cfxwrapper.cfxwrapper.CFXWrapper.execute">[docs]</a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newdeffile</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">deffile</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">newdeffile</span><span class="p">:</span>
+            <span class="n">use_old_df</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">intuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputvals</span><span class="p">)</span>
+            <span class="c">#see if in cache</span>
+            <span class="k">if</span> <span class="n">intuple</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+                <span class="n">outtuple</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">intuple</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outputvals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">outtuple</span><span class="p">)</span>
+                <span class="k">print</span> <span class="s">&#39;Found in cache: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">intuple</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">outtuple</span><span class="p">)</span>
+                <span class="k">return</span>
+    
+        <span class="c">#Write the ccl file</span>
+        <span class="n">cf</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cclfile</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">counter</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">possibleins</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputvals</span><span class="p">[</span><span class="n">counter</span><span class="p">]</span> <span class="o">!=</span> <span class="n">i</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">i</span><span class="o">.</span><span class="n">cclout</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputvals</span><span class="p">[</span><span class="n">counter</span><span class="p">])</span>
+            <span class="k">print</span> <span class="n">i</span><span class="o">.</span><span class="n">varname</span> <span class="o">+</span> <span class="s">&#39; = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputvals</span><span class="p">[</span><span class="n">counter</span><span class="p">])</span>
+        <span class="n">cf</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    
+            <span class="c">#Execute</span>
+        <span class="k">if</span> <span class="n">use_old_df</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solvecmd</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c">#MDPL - NOT WORKING</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfxpath</span><span class="p">,</span> <span class="s">&#39;cfx5solve.exe&#39;</span><span class="p">),</span>
+                <span class="s">&#39;-def&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">newdeffile</span><span class="p">,</span>
+                <span class="s">&#39;-ccl&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cclfile</span><span class="p">,</span>
+                <span class="s">&#39;-initial-file&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">origresfile</span><span class="p">,</span>
+                <span class="s">&#39;-fullname&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fullname</span><span class="p">]</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">CFXWrapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Error in &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solvecmd</span><span class="p">)</span>
+            <span class="k">print</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">return_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c">#Get the results</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_code</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c">#import pdb; pdb.set_trace()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">readmon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">readmoncmd</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputvals</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputvals</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">picklecache</span><span class="p">()</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">cfxwrapper 0.1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011-2013 Mechanical Solutions, Inc..
+      Last updated on Oct 30, 2013.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

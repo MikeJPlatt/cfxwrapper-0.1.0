@@ -1,0 +1,79 @@
+
+================
+Package Metadata
+================
+
+- **author:** Mechanical Solutions Inc.
+
+- **author-email:** OpenSource@mechsol.com
+
+- **classifier**:: 
+
+    Intended Audience :: Science/Research
+    Topic :: Scientific/Engineering
+
+- **copyright:** 2011-2013 Mechanical Solutions, Inc.
+
+- **description-file:** README.txt
+
+- **download-url:** https://github.com/openmdao-plugins
+
+- **entry_points**:: 
+
+    [openmdao.component]
+    cfxwrapper.cfxwrapper.CFXWrapper=cfxwrapper.cfxwrapper:CFXWrapper
+    cfxwrapper.cfxwrappergenerator.TestCFX=cfxwrapper.cfxwrappergenerator:TestCFX
+    [openmdao.container]
+    cfxwrapper.cfxwrapper.CFXWrapper=cfxwrapper.cfxwrapper:CFXWrapper
+    cfxwrapper.cfxwrappergenerator.TestCFX=cfxwrapper.cfxwrappergenerator:TestCFX
+
+- **home-page:** http://www.mechsol.com
+
+- **keywords:** openmdao
+
+- **license**:: 
+
+    Copyright (c) 2013, Mechanical Solutions, Inc.
+    All rights reserved.
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+    * Neither the name of the <organization> nor the
+    names of its contributors may be used to endorse or promote products
+    derived from this software without specific prior written permission.
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL MECHANICAL SOLUTIONS, INC BE LIABLE FOR ANY
+    DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+- **maintainer:** Mechanical Solutions Inc.
+
+- **maintainer-email:** OpenSource@mechsol.com
+
+- **name:** cfxwrapper
+
+- **project-url:** http://www.mechsol.com
+
+- **requires-dist:** openmdao.main
+
+- **requires-externals:** ANSYS CFX
+
+- **requires-python**:: 
+
+    >=2.6
+    <3.0
+
+- **static_path:** [ '_static' ]
+
+- **version:** 0.1.0
+
